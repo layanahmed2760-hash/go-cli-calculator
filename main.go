@@ -21,6 +21,12 @@ func divide(a, b float64) (float64, error) {
 	}
 	return a / b, nil
 }
+type Calculation struct {
+	num1 float64
+	num2    float64
+	operator string
+	result float64
+}
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 	for {
