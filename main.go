@@ -31,7 +31,74 @@ type Calculation struct {
 	result   float64
 }
 func tokenize(expr string) []string {
-	return strings.Fields(expr)
+	return strings.Fields(expr) 
+var precedence = map[string]int{
+	"+": 1,
+	"-": 1,
+	"*": 2,
+	"/": 2,
+}
+
+func evaluateExpression(tokens []string) (float64, error) {
+	var numStack []float64
+	var opStack []string
+
+	applyOp := func() error {
+		if len(numStack) < 2 || len(opStack) == 0 {
+			return fmt.Errorf("invalid expression")
+		}
+		b := numStack[len(numStack)-1]
+		a := numStack[len(numStack)-2]
+		numStack = numStack[:len(numStack)-2]
+
+		op := opStack[len(opStack)-1]
+		opStack = opStack[:len(opStack)-1]
+
+		var result float64
+		switch op {
+		case "+":
+			result = add(a, b)
+		case "-":
+			result = subtract(a, b)
+		case "*":
+			result = multiply(a, b)
+		case "/":
+			var err error
+			result, err = divide(a, b)
+			if err != nil {
+				return err
+			}
+		}
+		numStack = append(numStack, result)
+		return nil
+	}
+
+	for _, token := range tokens {
+		if num, err := strconv.ParseFloat(token, 64); err == nil {
+			numStack = append(numStack, num)
+		} else if prec, ok := precedence[token]; ok {
+			for len(opStack) > 0 && precedence[opStack[len(opStack)-1]] >= prec {
+				if err := applyOp(); err != nil {
+					return 0, err
+				}
+			}
+			opStack = append(opStack, token)
+		} else {
+			return 0, fmt.Errorf("invalid token: %s", token)
+		}
+	}
+
+	for len(opStack) > 0 {
+		if err := applyOp(); err != nil {
+			return 0, err
+		}
+	}
+
+	if len(numStack) != 1 {
+		return 0, fmt.Errorf("invalid expression")
+	}
+	return numStack[0], nil
+}
 }
 func main() {
 	reader := bufio.NewReader(os.Stdin)
