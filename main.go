@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
+	"strconv"
 )
 
 func add(a, b float64) float64 {
@@ -21,15 +23,20 @@ func divide(a, b float64) (float64, error) {
 	}
 	return a / b, nil
 }
+
 type Calculation struct {
-	num1 float64
-	num2    float64
+	num1     float64
+	num2     float64
 	operator string
-	result float64
+	result   float64
+}
+func tokenize(expr string) []string {
+	return strings.Fields(expr)
 }
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 	var history []Calculation
+
 
 	for {
 		fmt.Println("\n--- Menu ---")
@@ -38,7 +45,7 @@ func main() {
 		fmt.Println("3. Clear History")
 		fmt.Println("4. Exit")
 		fmt.Print("Choose an option: ")
-		
+
 		var choice string
 		fmt.Fscanln(reader, &choice)
 
