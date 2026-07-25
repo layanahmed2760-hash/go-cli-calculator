@@ -31,7 +31,9 @@ type Calculation struct {
 	result   float64
 }
 func tokenize(expr string) []string {
-	return strings.Fields(expr) 
+	return strings.Fields(expr)
+}
+
 var precedence = map[string]int{
 	"+": 1,
 	"-": 1,
@@ -99,18 +101,19 @@ func evaluateExpression(tokens []string) (float64, error) {
 	}
 	return numStack[0], nil
 }
-}
+
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 	var history []Calculation
 
 
 	for {
-		fmt.Println("\n--- Menu ---")
+		fmt.Println("\n Menu ")
 		fmt.Println("1. Calculate")
 		fmt.Println("2. View History")
 		fmt.Println("3. Clear History")
 		fmt.Println("4. Exit")
+		fmt.Println("5. Evaluate Expression")
 		fmt.Print("Choose an option: ")
 
 		var choice string
@@ -170,8 +173,23 @@ func main() {
 			fmt.Println("Exiting the calculator.")
 			return
 
+		case "5":
+	fmt.Println("Enter expression (e.g. 2 + 3 * 4): ")
+	exprLine, _ := reader.ReadString('\n')
+	exprLine = strings.TrimSpace(exprLine)
+
+	tokens := tokenize(exprLine)
+	result, err := evaluateExpression(tokens)
+	if err != nil {
+		fmt.Println("Error:", err)
+		continue
+	}
+
+	fmt.Println("Result:", result)
+	history = append(history, Calculation{0, 0, exprLine, result})
+
 		default:
-			fmt.Println("Invalid menu option. Choose 1-4.")
+			fmt.Println("Invalid menu option. Choose 1-5.")
 		}
 	}
 }
